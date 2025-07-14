@@ -2,8 +2,11 @@ services:
   - type: web
     name: roteiro-dispersacao
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app_production:app
+buildCommand: |
+  pyenv install 3.10.13
+  pyenv global 3.10.13
+  pip install -r requirements.txt
+  startCommand: gunicorn app_production:app
     envVars:
       - key: FLASK_ENV
         value: production
