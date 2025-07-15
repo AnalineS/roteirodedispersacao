@@ -1,9 +1,8 @@
 services:
   - type: web
-    name: roteiro-dispersacao
+    name: chatbot-dispensacao
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app_production:app
-    envVars:
-      - key: FLASK_ENV
-        value: production
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app_production.py"
+    runtime: python
