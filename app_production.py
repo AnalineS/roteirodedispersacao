@@ -10,6 +10,7 @@ import numpy as np
 import hashlib
 import pickle
 from datetime import datetime
+from chatbot_core import DispensacaoChatbot
 import logging
 
 # Configuração de logging
@@ -1030,6 +1031,48 @@ def chat_api():
             return jsonify({"error": "Requisição deve ser JSON"}), 400
 
         data = request.get_json(force=True, silent=True)
+
+        # Instancia o chatbot
+dispensacao_bot = DispensacaoChatbot()
+
+@app.route('/')
+def index():
+    return "Servidor do Chatbot de Dispensacao Farmacêutica ativo."
+
+@app.route('/api/chat', methods=['POST'])
+def chat_api():
+    try:
+        if not request.is_json:
+            return jsonify({"error": "Requisição deve ser JSON"}), 400
+
+        data = request.get_json()
+        question = data.get('question', '').strip()
+        personality_id = data.get('personality_id')
+
+        if not question:
+            return jsonify({"error": "Pergunta não fornecida"}), 400
+
+        if not personality_id:
+            return jsonify({"error": "Personalidade não fornecida"}), 400
+
+        response = dispensacao_bot.answer_question(question, personality_id)
+        return jsonify(response)
+
+    except Exception as e:
+        logger.error(f"Erro na API de chat: {e}")
+        return jsonify({"error": "Erro interno do servidor"}), 500
+
+@app.route('/api/health')
+def health():
+    return jsonify({
+        "status": "ok",
+        "pdf_loaded": len(dispensacao_bot.chunks) > 0,
+        "models_loaded": dispensacao_bot.embedding_model is not None,
+        "timestamp": datetime.now().isoformat()
+    })
+
+if __name__ == '__main__':
+    app.run(debug=False, host='0.0.0.0', port=5000)
         if not data:
             return jsonify({"error": "JSON inválido ou vazio"}), 400
 
