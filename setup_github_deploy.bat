@@ -1,92 +1,89 @@
 @echo off
 echo ========================================
-echo  SETUP GITHUB ACTIONS - NETLIFY DEPLOY
+echo 🔧 CONFIGURACAO GITHUB ACTIONS
 echo ========================================
 echo.
 
-echo [1/8] Verificando se o Git esta instalado...
+echo 1. Verificando se o Git esta instalado...
 git --version >nul 2>&1
 if errorlevel 1 (
-    echo ERRO: Git nao esta instalado!
-    echo Instale o Git em: https://git-scm.com/download/win
-    echo Depois execute este script novamente.
+    echo ❌ Git nao encontrado! Instale o Git primeiro.
+    echo 📥 Download: https://git-scm.com/download/win
     pause
     exit /b 1
 )
+echo ✅ Git encontrado
 
-echo [2/8] Verificando se estamos em um repositorio Git...
-git status >nul 2>&1
-if errorlevel 1 (
-    echo Inicializando repositorio Git...
+echo.
+echo 2. Verificando se este e um repositorio Git...
+if not exist ".git" (
+    echo 📁 Inicializando repositorio Git...
     git init
-    git remote add origin https://github.com/AnalineS/siteroteirodedispersacao.git
-)
-
-echo [3/8] Criando pasta .github/workflows...
-if not exist ".github" mkdir .github
-if not exist ".github\workflows" mkdir .github\workflows
-
-echo [4/8] Copiando workflow do GitHub Actions...
-copy "github_netlify_deploy.yml" ".github\workflows\deploy.yml" >nul
-if errorlevel 1 (
-    echo ERRO: Falha ao copiar workflow
-    pause
-    exit /b 1
-)
-
-echo [5/8] Adicionando arquivos ao Git...
-git add .
-git add -f PDFs/
-git add -f functions/
-git add -f requirements.txt
-git add -f netlify_build_fix.sh
-git add -f netlify.toml
-git add -f index.html
-git add -f script.js
-
-echo [6/8] Verificando se ha mudancas para commitar...
-git status --porcelain | findstr . >nul
-if errorlevel 1 (
-    echo Nenhuma mudanca detectada.
+    echo ✅ Repositorio inicializado
 ) else (
-    echo [7/8] Fazendo commit das mudancas...
-    git commit -m "Setup deploy automático com GitHub Actions e melhorias do chatbot"
-    if errorlevel 1 (
-        echo ERRO: Falha ao fazer commit!
-        pause
-        exit /b 1
-    )
+    echo ✅ Repositorio Git encontrado
 )
 
-echo [8/8] Fazendo push para o GitHub...
-git push -u origin main
+echo.
+echo 3. Verificando arquivos de workflow...
+if not exist ".github\workflows" (
+    echo 📁 Criando diretorio de workflows...
+    mkdir ".github\workflows"
+    echo ✅ Diretorio criado
+)
+
+echo.
+echo 4. Verificando se o workflow ja existe...
+if exist ".github\workflows\deploy-render.yml" (
+    echo ⚠️  Workflow ja existe. Atualizando...
+) else (
+    echo 📝 Criando workflow de deploy...
+)
+
+echo.
+echo 5. Configurando Git...
+git config --global user.name "Deploy Bot"
+git config --global user.email "deploy@example.com"
+
+echo.
+echo 6. Adicionando arquivos ao Git...
+git add .
+git commit -m "Configuracao de deploy automatico para Render"
+
+echo.
+echo 7. Verificando remote...
+git remote -v | findstr "origin" >nul
 if errorlevel 1 (
-    echo ERRO: Falha ao fazer push!
-    echo Verifique se o repositorio remoto esta configurado corretamente.
-    echo Execute: git remote -v
-    pause
-    exit /b 1
+    echo 📋 Para conectar ao GitHub:
+    echo 1. Crie um repositorio em: https://github.com/new
+    echo 2. Execute: git remote add origin https://github.com/SEU_USUARIO/SEU_REPO.git
+    echo 3. Execute: git push -u origin main
+) else (
+    echo ✅ Remote configurado
+    echo 📤 Fazendo push para GitHub...
+    git push origin main
 )
 
 echo.
 echo ========================================
-echo  SUCESSO! GITHUB ACTIONS CONFIGURADO
+echo ✅ CONFIGURACAO CONCLUIDA!
 echo ========================================
 echo.
-echo ✅ Workflow criado: .github/workflows/deploy.yml
-echo ✅ Arquivos enviados para: https://github.com/AnalineS/siteroteirodedispersacao
+echo 📋 PROXIMOS PASSOS:
+echo 1. Conecte seu repositorio ao Render:
+echo    - Acesse: https://dashboard.render.com
+echo    - Clique em "New +" > "Web Service"
+echo    - Conecte sua conta GitHub
+echo    - Selecione este repositorio
 echo.
-echo 🚀 Proximos passos:
-echo 1. Acesse: https://app.netlify.com/
-echo 2. "Add new site" > "Import an existing project"
-echo 3. Conecte com GitHub: AnalineS/siteroteirodedispersacao
-echo 4. Configure:
-echo    - Build command: bash netlify_build_fix.sh
-echo    - Publish directory: .
-echo    - Functions directory: functions
-echo    - Python version: 3.9
-echo 5. Clique em "Deploy site"
+echo 2. Configure o servico:
+echo    - Name: roteiro-dispersacao
+echo    - Environment: Python
+echo    - Build Command: pip install -r requirements.txt
+echo    - Start Command: gunicorn app_optimized:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
 echo.
-echo 🔄 Apos configurado, cada push para main fara deploy automatico!
+echo 3. Deploy automatico:
+echo    - Cada push para main = novo deploy
+echo    - Acesse: https://roteiro-dispersacao.onrender.com
 echo.
 pause 

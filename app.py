@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-import pdfplumber
 import os
 from transformers import pipeline, AutoTokenizer, AutoModelForQuestionAnswering
 import torch
@@ -16,26 +15,22 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Variáveis globais
-PDF_PATH = 'Roteiro-de-Dsispensacao-Hanseniase-F.docx.pdf'
-pdf_text = ""
+MD_PATH = 'PDFs/Roteiro de Dsispensação - Hanseníase.md'
+md_text = ""
 qa_pipeline = None
 tokenizer = None
 model = None
 
-def extract_pdf_text(pdf_path):
-    """Extrai texto do PDF"""
-    global pdf_text
+def extract_md_text(md_path):
+    """Extrai texto do arquivo Markdown"""
+    global md_text
     try:
-        text = ""
-        with pdfplumber.open(pdf_path) as pdf:
-            for page_num, page in enumerate(pdf.pages):
-                page_text = page.extract_text()
-                if page_text:
-                    text += f"\n--- Página {page_num + 1} ---\n{page_text}\n"
-        logger.info(f"PDF extraído com sucesso. Total de caracteres: {len(text)}")
+        with open(md_path, 'r', encoding='utf-8') as file:
+            text = file.read()
+        logger.info(f"Arquivo Markdown extraído com sucesso. Total de caracteres: {len(text)}")
         return text
     except Exception as e:
-        logger.error(f"Erro ao extrair PDF: {e}")
+        logger.error(f"Erro ao extrair arquivo Markdown: {e}")
         return ""
 
 def load_ai_model():
@@ -96,14 +91,14 @@ def find_relevant_context(question, full_text, max_length=4000):
 
 def answer_question(question, persona):
     """Responde à pergunta usando o modelo de IA"""
-    global qa_pipeline, pdf_text
+    global qa_pipeline, md_text
     
-    if not qa_pipeline or not pdf_text:
+    if not qa_pipeline or not md_text:
         return fallback_response(persona, "Modelo não disponível")
     
     try:
         # Encontra contexto relevante
-        context = find_relevant_context(question, pdf_text)
+        context = find_relevant_context(question, md_text)
         
         # Faz a pergunta ao modelo
         result = qa_pipeline(
@@ -116,9 +111,14 @@ def answer_question(question, persona):
         answer = result['answer'].strip()
         confidence = result['score']
         
-        # Se a confiança for baixa ou resposta vazia, usa fallback
+        logger.info(f"Pergunta: {question}")
+        logger.info(f"Confiança: {confidence}")
+        logger.info(f"Resposta: {answer}")
+        
+        # Se a confiança for baixa ou resposta vazia, usa fallback aprimorado
         if not answer or confidence < 0.3:
-            return fallback_response(persona, "Informação não encontrada na tese")
+            logger.info("Usando fallback aprimorado - confiança baixa")
+            return enhanced_fallback_response(question, persona, context)
         
         return format_persona_answer(answer, persona, confidence)
         
@@ -127,18 +127,29 @@ def answer_question(question, persona):
         return fallback_response(persona, "Erro técnico")
 
 def format_persona_answer(answer, persona, confidence):
-    """Formata a resposta de acordo com a personalidade"""
+    """Formata a resposta de acordo com a personalidade, usando linguagem natural"""
     if persona == "dr_gasnelio":
+        # Resposta técnica, mas acolhedora e natural
         return {
-            "answer": f"Dr. Gasnelio responde:\n\n{answer}\n\n*Baseado na tese sobre roteiro de dispensação para hanseníase. Confiança: {confidence:.1%}*",
+            "answer": (
+                f"Olá! Aqui é o Dr. Gasnelio. Sobre sua dúvida:\n\n"
+                f"{answer}\n\n"
+                f"Se precisar de mais detalhes ou exemplos, posso explicar de outra forma.\n"
+                f"*Baseado na tese sobre roteiro de dispensação para hanseníase. Confiança: {confidence:.1%}*"
+            ),
             "persona": "dr_gasnelio",
             "confidence": confidence
         }
     elif persona == "ga":
-        # Simplifica a resposta para o Gá
+        # Simplifica e deixa a resposta ainda mais próxima do cotidiano
         simple_answer = simplify_text(answer)
         return {
-            "answer": f"Gá explica:\n\n{simple_answer}\n\n*Tá na tese, pode confiar! 😊*",
+            "answer": (
+                f"Oi! Eu sou o Gá. Olha só, de um jeito bem simples:\n\n"
+                f"{simple_answer}\n\n"
+                f"Se quiser, posso dar um exemplo ou explicar de outro jeito. É só pedir! 😊\n"
+                f"*Essa explicação veio direto da tese, mas falei do meu jeito pra facilitar.*"
+            ),
             "persona": "ga",
             "confidence": confidence
         }
@@ -150,34 +161,94 @@ def format_persona_answer(answer, persona, confidence):
         }
 
 def simplify_text(text):
-    """Simplifica o texto para o Gá"""
-    # Remove termos muito técnicos e substitui por versões mais simples
+    """Simplifica o texto para o Gá, deixando mais natural e próximo do cotidiano"""
     replacements = {
-        "dispensação": "entrega de remédios",
-        "farmacêutico": "farmacêutico",
+        "dispensação": "entrega do remédio na farmácia",
+        "farmacêutico": "farmacêutico (quem trabalha na farmácia)",
         "medicamentos": "remédios",
-        "tratamento": "tratamento",
-        "hanseníase": "hanseníase",
-        "protocolo": "guia",
+        "tratamento": "tratamento (o que a pessoa faz para melhorar)",
+        "hanseníase": "hanseníase (doença de pele)",
+        "protocolo": "guia de cuidados",
         "orientação": "explicação",
-        "paciente": "pessoa",
-        "adesão": "seguir o tratamento",
-        "posologia": "como tomar",
-        "posologia": "como usar",
-        "administração": "como tomar",
-        "via de administração": "como tomar",
-        "reação adversa": "efeito colateral",
-        "interação medicamentosa": "mistura de remédios"
+        "paciente": "pessoa que está tratando",
+        "adesão": "seguir direitinho o tratamento",
+        "posologia": "como tomar o remédio",
+        "administração": "como usar o remédio",
+        "via de administração": "jeito de tomar o remédio",
+        "reação adversa": "efeito colateral (coisa ruim que pode acontecer)",
+        "interação medicamentosa": "mistura de remédios que pode dar problema",
+        "supervisionada": "com alguém olhando junto",
+        "autoadministrada": "a própria pessoa toma sozinha",
+        "prescrição": "receita do médico",
+        "dose": "quantidade do remédio",
+        "contraindicação": "quando não pode usar",
+        "indicação": "quando é recomendado usar"
     }
-    
     simplified = text
     for technical, simple in replacements.items():
         simplified = simplified.replace(technical, simple)
-    
+    # Deixar frases mais curtas e naturais
+    simplified = simplified.replace(". ", ".\n")
     return simplified
+
+def enhanced_fallback_response(question, persona, context):
+    """Fallback aprimorado que retorna trecho relevante do PDF"""
+    logger.info("Executando fallback aprimorado")
+    
+    # Busca por palavras-chave na pergunta
+    question_words = set(re.findall(r'\w+', question.lower()))
+    
+    # Divide o contexto em parágrafos
+    paragraphs = context.split('\n\n')
+    
+    best_paragraph = ""
+    best_score = 0
+    
+    for paragraph in paragraphs:
+        if len(paragraph.strip()) < 50:  # Ignora parágrafos muito pequenos
+            continue
+            
+        paragraph_words = set(re.findall(r'\w+', paragraph.lower()))
+        common_words = question_words.intersection(paragraph_words)
+        score = len(common_words) / len(question_words) if question_words else 0
+        
+        if score > best_score:
+            best_score = score
+            best_paragraph = paragraph
+    
+    # Se encontrou um parágrafo relevante
+    if best_paragraph and best_score > 0.1:
+        logger.info(f"Parágrafo relevante encontrado com score: {best_score}")
+        
+        if persona == "dr_gasnelio":
+            return {
+                "answer": f"Dr. Gasnelio responde:\n\nBaseado na minha tese sobre roteiro de dispensação para hanseníase, encontrei esta informação técnica relevante:\n\n\"{best_paragraph.strip()}\"\n\n*Esta é uma extração direta do texto da tese. Para informações mais específicas, recomendo consultar a seção completa.*",
+                "persona": "dr_gasnelio",
+                "confidence": best_score
+            }
+        elif persona == "ga":
+            # Simplifica o texto para o Gá
+            simple_paragraph = simplify_text(best_paragraph.strip())
+            return {
+                "answer": f"Gá responde:\n\nOlha só o que encontrei na tese:\n\n\"{simple_paragraph}\"\n\n*Tá na tese, pode confiar! 😊*",
+                "persona": "ga",
+                "confidence": best_score
+            }
+        else:
+            return {
+                "answer": f"Encontrei esta informação na tese:\n\n\"{best_paragraph.strip()}\"",
+                "persona": "default",
+                "confidence": best_score
+            }
+    
+    # Se não encontrou nada relevante, usa fallback padrão
+    logger.info("Nenhum parágrafo relevante encontrado, usando fallback padrão")
+    return fallback_response(persona, "Informação não encontrada na tese")
 
 def fallback_response(persona, reason=""):
     """Resposta de fallback quando não encontra informação"""
+    logger.info(f"Executando fallback padrão para persona: {persona}")
+    
     if persona == "dr_gasnelio":
         return {
             "answer": f"Dr. Gasnelio responde:\n\nDesculpe, não encontrei essa informação específica na minha tese sobre roteiro de dispensação para hanseníase. {reason}\n\nPosso ajudá-lo com outras questões relacionadas ao tema da pesquisa.",
@@ -201,6 +272,20 @@ def fallback_response(persona, reason=""):
 def index():
     """Página principal"""
     return render_template('index.html')
+
+@app.route('/tese')
+def tese():
+    return render_template('tese.html')
+
+@app.route('/script.js')
+def serve_script():
+    """Serve o arquivo script.js na raiz do projeto"""
+    return app.send_static_file('script.js')
+
+@app.route('/tese.js')
+def serve_tese_script():
+    """Serve o arquivo tese.js na raiz do projeto"""
+    return app.send_static_file('tese.js')
 
 @app.route('/api/chat', methods=['POST'])
 def chat_api():
@@ -236,7 +321,7 @@ def health_check():
     return jsonify({
         "status": "healthy",
         "model_loaded": qa_pipeline is not None,
-        "pdf_loaded": len(pdf_text) > 0,
+        "pdf_loaded": len(md_text) > 0,
         "timestamp": datetime.now().isoformat()
     })
 
@@ -260,11 +345,11 @@ if __name__ == '__main__':
     logger.info("Iniciando aplicação...")
     
     # Carrega o PDF
-    if os.path.exists(PDF_PATH):
-        pdf_text = extract_pdf_text(PDF_PATH)
+    if os.path.exists(MD_PATH):
+        md_text = extract_md_text(MD_PATH)
     else:
-        logger.warning(f"PDF não encontrado: {PDF_PATH}")
-        pdf_text = "PDF não disponível"
+        logger.warning(f"Arquivo Markdown não encontrado: {MD_PATH}")
+        md_text = "Arquivo Markdown não disponível"
     
     # Carrega o modelo de IA
     load_ai_model()

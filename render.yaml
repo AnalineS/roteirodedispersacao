@@ -1,11 +1,18 @@
 services:
   - type: web
-    name: roteiro-dispersacao
+    name: roteiro-dispersacao-chatbot
     env: python
+    plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app_production:app
+    startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.13
-      - key: FLASK_ENV
-        value: production
+        value: 3.11.4
+      - key: GITHUB_PAT
+        sync: false
+      - key: LANGFLOW_API_KEY
+        sync: false
+      - key: RENDER_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false 

@@ -180,3 +180,104 @@ Assim que você criar o novo repositório, me envie o link dele ou apenas confir
 
 Se quiser, posso te passar os comandos para você mesmo executar, ou faço tudo por aqui.  
 Me avise quando o novo repositório estiver criado! 
+
+==> Cloning from https://github.com/AnalineS/siteroteirodedispersacao-old
+
+Por isso, ele não encontra o arquivo correto, pois o deploy está sendo feito a partir do repositório antigo, que pode estar corrompido ou incompleto.
+
+---
+
+## **Como resolver:**
+
+1. **No Render, exclua o serviço atual** (ou crie um novo).
+2. **Crie um novo serviço** e conecte ao repositório correto:
+   ```
+   https://github.com/AnalineS/siteroteirodedispersacao
+   ```
+   (sem o `-old` no final!)
+
+3. **Garanta que o deploy será feito a partir do repositório novo e limpo.**
+
+---
+
+**Resumo:**  
+O erro não é mais de código ou estrutura, mas sim de deploy no repositório errado.  
+Basta criar um novo serviço no Render apontando para o repositório correto e o deploy deve funcionar!
+
+Se precisar, posso te passar o passo a passo para criar o serviço do zero no Render.  
+Me avise se quiser esse guia rápido! 
+
+Ótimo, você já criou sua conta no PythonAnywhere: [https://www.pythonanywhere.com/user/analines/](https://www.pythonanywhere.com/user/analines/)
+
+Agora, siga este passo a passo para migrar e rodar seu projeto Flask/IA no PythonAnywhere:
+
+---
+
+## **1. Faça upload dos arquivos do seu projeto**
+- No painel do PythonAnywhere, clique em **Files**.
+- Crie uma pasta para o projeto, por exemplo: `meusite`.
+- Faça upload dos arquivos essenciais:
+  - `app_production.py`
+  - `requirements.txt`
+  - `PDFs/Roteiro de Dsispensação - Hanseníase F.docx`
+  - Outras dependências necessárias (ex: scripts, arquivos de configuração).
+
+---
+
+## **2. Crie um ambiente virtual**
+No console do PythonAnywhere (aba **Consoles**):
+```bash
+mkvirtualenv venv --python=python3.10
+workon venv
+pip install -r /home/analines/meusite/requirements.txt
+```
+> Ajuste o caminho se sua pasta tiver outro nome.
+
+---
+
+## **3. Configure o Web App**
+- No painel, vá em **Web** > **Add a new web app**.
+- Escolha **Manual configuration** > **Python 3.10**.
+- No campo **Source code**, coloque o caminho da sua pasta, ex: `/home/analines/meusite`
+- No campo **Virtualenv**, coloque: `/home/analines/.virtualenvs/venv`
+
+---
+
+## **4. Edite o arquivo WSGI**
+- No painel **Web**, clique em **WSGI configuration file** (link azul).
+- Substitua o conteúdo por:
+  ```python
+  import sys
+  path = '/home/analines/meusite'
+  if path not in sys.path:
+      sys.path.append(path)
+
+  from app_production import app as application
+  ```
+
+---
+
+## **5. (Opcional) Configure arquivos estáticos**
+Se usar arquivos estáticos (CSS, JS, imagens), configure a URL `/static/` apontando para a pasta correta.
+
+---
+
+## **6. Reinicie o Web App**
+- No painel **Web**, clique em **Reload**.
+
+---
+
+## **7. Teste seu site**
+- O endereço será algo como:  
+  ```
+  https://analines.pythonanywhere.com/
+  ```
+
+---
+
+Se aparecer algum erro, envie a mensagem de erro aqui que te ajudo a corrigir!  
+Se quiser um tutorial visual com prints, me avise.
+
+Referência: [PythonAnywhere - Documentação oficial](https://help.pythonanywhere.com/pages/Flask/)
+
+Se precisar de comandos prontos para upload via console ou dúvidas sobre o requirements, só pedir! 
