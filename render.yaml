@@ -1,8 +1,8 @@
 # render.yaml
 services:
   - type: web
-    name: frontend
-    env: docker
+    env: python
+    runtime: python-3.11
     buildCommand: pip install -r requirements.txt
     startCommand: streamlit run streamlit_app_friendly.py --server.port=$PORT --server.address=0.0.0.0
     healthCheckPath: /health  # precisaremos de um pequeno endpoint
