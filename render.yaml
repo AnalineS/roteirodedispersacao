@@ -1,18 +1,15 @@
+# render.yaml
 services:
   - type: web
-    name: roteiro-dispersacao-chatbot
-    env: python
-    plan: free
+    name: frontend
+    env: docker
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: streamlit run streamlit_app_friendly.py --server.port=$PORT --server.address=0.0.0.0
+    healthCheckPath: /health  # precisaremos de um pequeno endpoint
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.4
-      - key: GITHUB_PAT
+      - key: OPENROUTER_API_KEY
+        sync: false           # encrypted
+      - key: ASTRA_DB_TOKEN
         sync: false
-      - key: LANGFLOW_API_KEY
-        sync: false
-      - key: RENDER_API_KEY
-        sync: false
-      - key: OPENAI_API_KEY
+      - key: ASTRA_DB_ENDPOINT
         sync: false
