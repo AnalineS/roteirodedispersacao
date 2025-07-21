@@ -53,7 +53,7 @@ def test_chat(question, persona):
     try:
         payload = {
             "question": question,
-            "persona": persona
+            "personality_id": persona
         }
         
         response = requests.post(

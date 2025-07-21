@@ -38,7 +38,7 @@ def load_ai_model():
     global qa_pipeline, tokenizer, model
     try:
         # Usando modelo gratuito e leve
-        model_name = "deepset/roberta-base-squad2"
+        model_name = "kimie/kimie2-pt-qa:free"
         logger.info(f"Carregando modelo: {model_name}")
         
         qa_pipeline = pipeline(
@@ -336,7 +336,7 @@ def api_info():
             "dr_gasnelio": "Professor sério e técnico",
             "ga": "Amigo descontraído que explica de forma simples"
         },
-        "model": "deepset/roberta-base-squad2",
+        "model": "kimie/kimie2-pt-qa:free",
         "pdf_source": "Roteiro de Dispensação para Hanseníase"
     })
 

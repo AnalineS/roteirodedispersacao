@@ -1,11 +1,19 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-import os
-from transformers import pipeline, AutoTokenizer, AutoModelForQuestionAnswering
-import torch
-import re
 import logging
 from datetime import datetime
+
+# Remover import antigo (chatbot.py não existe mais)
+# from chatbot import ChatbotService  # Removido
+
+# Novo import do chatbot
+from functions.api import HanseniaseChatbot
+
+# Inicializar o chatbot globalmente
+chatbot = HanseniaseChatbot()
 
 app = Flask(__name__)
 CORS(app)
@@ -314,6 +322,16 @@ def chat_api():
     except Exception as e:
         logger.error(f"Erro na API de chat: {e}")
         return jsonify({"error": "Erro interno do servidor"}), 500
+
+@app.route('/api/test_chatbot', methods=['POST'])
+def test_chatbot():
+    data = request.get_json()
+    question = data.get('question', '').strip()
+    personality_id = data.get('personality_id', 'dr_gasnelio')
+    if not question:
+        return jsonify({'error': 'Pergunta não fornecida'}), 400
+    response = chatbot.answer_question(question, personality_id)
+    return jsonify(response)
 
 @app.route('/api/health', methods=['GET'])
 def health_check():

@@ -25,12 +25,12 @@ jobs:
         
     - name: Test application
       run: |
-        python -c "import app_optimized; print('App import successful')"
+        python -c "import functions.api; print('API import successful')"
         
     - name: Create deployment package
       run: |
         mkdir -p deploy_package
-        cp app_optimized.py deploy_package/
+        cp functions/api.py deploy_package/
         cp requirements.txt deploy_package/
         cp runtime.txt deploy_package/
         cp gunicorn.conf.py deploy_package/

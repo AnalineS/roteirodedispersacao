@@ -100,7 +100,7 @@ Envia uma pergunta para o chatbot.
 ```json
 {
   "question": "Qual a dose de rifampicina?",
-  "persona": "dr_gasnelio"
+  "personality_id": "dr_gasnelio"
 }
 ```
 

@@ -90,6 +90,8 @@ echo 📦 Criando arquivo ZIP para deploy...
 
 REM Criar ZIP com todos os arquivos necessários
 powershell -Command "Compress-Archive -Path 'requirements.txt', 'netlify_production.toml', 'netlify_build_fix.sh', 'functions', 'index.html', 'PDFs', '.gitignore', 'runtime.txt', '.python-version' -DestinationPath 'deploy_producao.zip' -Force"
+REM Garantir que o arquivo functions/api.py está incluído e destacado como principal backend
+powershell -Command "Compress-Archive -Path 'functions/api.py' -DestinationPath 'deploy_producao.zip' -Force"
 
 if exist deploy_producao.zip (
     echo ✅ deploy_producao.zip criado com sucesso!

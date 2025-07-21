@@ -54,7 +54,7 @@ fi
 
 # Testar a aplicação localmente
 print_status "Testando aplicação localmente..."
-python3 app.py &
+python3 functions/api.py &
 APP_PID=$!
 
 # Aguardar o servidor iniciar
@@ -116,7 +116,7 @@ case $choice in
     4)
         print_status "Executando localmente..."
         print_status "Acesse: http://localhost:5000"
-        python3 app.py
+        python3 functions/api.py
         ;;
     5)
         print_status "Saindo..."

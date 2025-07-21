@@ -4,6 +4,7 @@ import sys
 import logging
 from datetime import datetime
 import numpy as np
+from numpy import zeros, dot, argsort, linalg
 import hashlib
 import re
 
@@ -22,6 +23,9 @@ try:
 except ImportError as e:
     logger.error(f"Erro ao importar dependências: {e}")
     raise
+
+KIMIE2_MODEL = "kimie/kimie2-pt-qa:free"
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY_KIMIE2", "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")
 
 class HanseniaseChatbot:
     def __init__(self):
@@ -68,12 +72,13 @@ class HanseniaseChatbot:
         self.load_pdf_content()
     
     def load_models(self):
-        """Carrega os modelos de IA"""
+        """Carrega o modelo Kimie2 via HuggingFace/Transformers"""
         try:
-            logger.info("Carregando modelos de IA...")
+            logger.info("Carregando modelo Kimie2 via HuggingFace...")
             self.qa_pipeline = pipeline(
                 "question-answering",
-                model="deepset/roberta-base-squad2",
+                model=KIMIE2_MODEL,
+                tokenizer=KIMIE2_MODEL,
                 device=-1 if not torch.cuda.is_available() else 0
             )
             self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -169,7 +174,7 @@ class HanseniaseChatbot:
         
         try:
             # Busca por palavras-chave primeiro (mais rápida)
-            keyword_scores = np.zeros(len(self.chunks))
+            keyword_scores = zeros(len(self.chunks))
             question_words = set(question.lower().split())
             
             for i, chunk in enumerate(self.chunks):
@@ -188,15 +193,15 @@ class HanseniaseChatbot:
                 chunk_embeddings = self.embedding_model.encode(selected_chunks)
                 
                 # Calcular similaridade
-                similarities = np.dot(chunk_embeddings, question_embedding) / (
-                    np.linalg.norm(chunk_embeddings, axis=1) * np.linalg.norm(question_embedding)
+                similarities = dot(chunk_embeddings, question_embedding) / (
+                    linalg.norm(chunk_embeddings, axis=1) * linalg.norm(question_embedding)
                 )
                 
                 # Combinar scores
                 final_scores = 0.6 * similarities + 0.4 * keyword_scores[keyword_chunks]
                 
                 # Pegar os melhores
-                top_indices = np.argsort(final_scores)[-top_k:][::-1]
+                top_indices = argsort(final_scores)[-top_k:][::-1]
                 relevant_chunks = [selected_chunks[i] for i in top_indices if final_scores[i] > 0.05]
                 
             else:
@@ -204,11 +209,11 @@ class HanseniaseChatbot:
                 question_embedding = self.embedding_model.encode(question)
                 chunk_embeddings = self.embedding_model.encode(self.chunks)
                 
-                similarities = np.dot(chunk_embeddings, question_embedding) / (
-                    np.linalg.norm(chunk_embeddings, axis=1) * np.linalg.norm(question_embedding)
+                similarities = dot(chunk_embeddings, question_embedding) / (
+                    linalg.norm(chunk_embeddings, axis=1) * linalg.norm(question_embedding)
                 )
                 
-                top_indices = np.argsort(similarities)[-top_k:][::-1]
+                top_indices = argsort(similarities)[-top_k:][::-1]
                 relevant_chunks = [self.chunks[i] for i in top_indices if similarities[i] > 0.1]
             
             return relevant_chunks
