@@ -27,6 +27,14 @@ except ImportError as e:
 KIMIE2_MODEL = "kimie/kimie2-pt-qa:free"
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY_KIMIE2", "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")
 
+ASTRA_DB_ENDPOINT = os.environ.get("ASTRA_DB_ENDPOINT")
+ASTRA_DB_TOKEN = os.environ.get("ASTRA_DB_TOKEN")
+OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE = os.environ.get("OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE")
+
+logger.info(f"ASTRA_DB_ENDPOINT set: {bool(ASTRA_DB_ENDPOINT)}")
+logger.info(f"ASTRA_DB_TOKEN set: {bool(ASTRA_DB_TOKEN)}")
+logger.info(f"OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE set: {bool(OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE)}")
+
 class HanseniaseChatbot:
     def __init__(self):
         self.pdf_path = "PDFs/Roteiro de Dsispensação - Hanseníase F.docx.pdf"

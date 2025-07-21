@@ -28,6 +28,14 @@ if os.getenv("RENDER"):
     logging.getLogger("streamlit").setLevel(logging.WARNING)
     logging.getLogger("langchain").setLevel(logging.WARNING)
 
+ASTRA_DB_ENDPOINT = os.environ.get("ASTRA_DB_ENDPOINT")
+ASTRA_DB_TOKEN = os.environ.get("ASTRA_DB_TOKEN")
+OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE = os.environ.get("OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE")
+
+logging.info(f"ASTRA_DB_ENDPOINT set: {bool(ASTRA_DB_ENDPOINT)}")
+logging.info(f"ASTRA_DB_TOKEN set: {bool(ASTRA_DB_TOKEN)}")
+logging.info(f"OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE set: {bool(OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE)}")
+
 # Seu app Streamlit normal
 st.title("Streamlit App Friendly")
 st.write("Bem-vindo ao app!") 

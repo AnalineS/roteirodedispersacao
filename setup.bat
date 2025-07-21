@@ -43,6 +43,9 @@ echo.
 echo 4. Configuracao otimizada carregada.
 echo.
 
+echo 5. Configure as variáveis de ambiente (se necessário):
+echo    ASTRA_DB_ENDPOINT, ASTRA_DB_TOKEN, OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE
+
 echo ========================================
 echo  INSTALACAO CONCLUIDA!
 echo ========================================

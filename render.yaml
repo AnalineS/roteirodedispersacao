@@ -13,3 +13,4 @@ services:
         sync: false
       - key: ASTRA_DB_ENDPOINT
         sync: false
+# As variáveis ASTRA_DB_ENDPOINT, ASTRA_DB_TOKEN e OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE são configuradas via secrets/env do Render ou Codespace

@@ -6,9 +6,15 @@ Script de teste para a API do Chatbot
 import requests
 import json
 import time
+import os
 
 # Configuração
 BASE_URL = "http://localhost:5000"
+
+# Variáveis de ambiente para testes
+ASTRA_DB_ENDPOINT = os.environ.get("ASTRA_DB_ENDPOINT")
+ASTRA_DB_TOKEN = os.environ.get("ASTRA_DB_TOKEN")
+OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE = os.environ.get("OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE")
 
 def test_health():
     """Testa o endpoint de saúde"""

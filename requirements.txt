@@ -12,3 +12,7 @@ torch==2.1.0
 sentence-transformers==2.2.2
 langflow>=0.6.0
 typing-extensions>=4.0.0
+streamlit>=1.28
+
+# Para integração com Codespaces e secrets:
+# ASTRA_DB_ENDPOINT, ASTRA_DB_TOKEN, OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE

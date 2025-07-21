@@ -5,6 +5,10 @@ Teste simples do chat
 
 import requests
 import json
+import os
+ASTRA_DB_ENDPOINT = os.environ.get("ASTRA_DB_ENDPOINT")
+ASTRA_DB_TOKEN = os.environ.get("ASTRA_DB_TOKEN")
+OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE = os.environ.get("OPENROUTER_API_KEYROTEIRO_DISP_KIMIE_K2FREE")
 
 def test_chat():
     """Testa o chat localmente"""
