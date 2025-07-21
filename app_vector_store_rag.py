@@ -7,6 +7,11 @@ from dotenv import load_dotenv
 import re
 from datetime import datetime
 
+try:
+    from astrapy import DataAPIClient
+except ImportError:
+    from astrapy.client import AstraClient as DataAPIClient
+
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

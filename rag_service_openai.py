@@ -1,1 +1,1 @@
-from astrapy import DataAPIClient 
+from astrapy.client import AstraClient as DataAPIClient 
