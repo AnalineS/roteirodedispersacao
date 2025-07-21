@@ -1,5 +1,6 @@
 import sys
 import os
+import signal, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
@@ -19,7 +20,10 @@ app = Flask(__name__)
 CORS(app)
 
 # Configuração de logging
-logging.basicConfig(level=logging.INFO)
+if os.getenv("RENDER"):
+    logging.basicConfig(level=logging.WARNING)
+else:
+    logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Variáveis globais
@@ -28,6 +32,12 @@ md_text = ""
 qa_pipeline = None
 tokenizer = None
 model = None
+
+def shutdown_handler(signum, frame):
+    print("Recebido SIGTERM, encerrando...")
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, shutdown_handler)
 
 def extract_md_text(md_path):
     """Extrai texto do arquivo Markdown"""
@@ -278,8 +288,7 @@ def fallback_response(persona, reason=""):
 
 @app.route('/')
 def index():
-    """Página principal"""
-    return render_template('../templates/index.html')
+    return jsonify({"status": "ok", "service": "roteiro-backend"}), 200
 
 @app.route('/tese')
 def tese():
