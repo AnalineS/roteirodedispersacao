@@ -1,228 +1,137 @@
-# Chatbot Tese Hanseníase
+# Chatbot Inteligente para Roteiro de Dispensação
 
-Chatbot inteligente baseado na tese sobre roteiro de dispensação para hanseníase, com duas personalidades: Dr. Gasnelio (professor sério) e Gá (amigo descontraído).
+Chatbot modular e inteligente baseado em tese de roteiro de dispensação, com personalidades técnicas e amigáveis, integração com IA, busca semântica e interface moderna.
 
-## 🚀 Funcionalidades
+---
 
-- **Duas Personalidades**: 
-  - **Dr. Gasnelio**: Respostas técnicas e formais
-  - **Gá**: Explicações simples e descontraídas
-- **IA Gratuita**: Usa modelo Hugging Face (deepset/roberta-base-squad2)
-- **Baseado em PDF**: Responde exclusivamente com informações da tese
-- **Interface Moderna**: Design responsivo e intuitivo
+## 🚩 Estrutura do Projeto
 
-## 📋 Pré-requisitos
+```
+├── app/                # Backend principal (Flask, lógica RAG, integração LangFlow)
+│   ├── services/       # Utilitários centralizados (chunking, PDF, respostas)
+│   ├── ...
+├── backend/            # Alternativa de backend, integrações e endpoints
+├── frontend/           # Interface Streamlit (chatbot web)
+├── scripts/            # Scripts utilitários e manutenção
+├── tests/              # Testes automatizados
+├── relatorio-disp/     # Documentação, históricos, arquivos legados
+├── static/, templates/ # Recursos estáticos e templates HTML
+├── requirements.txt    # Dependências principais
+└── README.md           # Este arquivo
+```
 
-- Python 3.9+
-- PDF da tese: `Roteiro-de-Dsispensacao-Hanseniase-F.docx.pdf`
+---
 
-## 🛠️ Instalação
+## 👤 Para Usuários Finais
 
-### Windows (Recomendado)
-1. **Baixe o PDF da tese** do link fornecido:
-   - Link: https://drive.google.com/drive/folders/1435FhEIp_yOwtretv-G-ZQpNFY-f6tzr?usp=drive_link
-   - Salve como: `Roteiro-de-Dsispensacao-Hanseniase-F.docx.pdf` na raiz do projeto
-
-2. **Execute o instalador**:
-   ```cmd
-   setup.bat
+### Instalação Rápida
+1. **Pré-requisitos:** Python 3.9+, internet, PDF da tese
+2. **Clone o repositório:**
+   ```bash
+   git clone <url-do-repositorio>
+   cd gemini-v2
    ```
-
-3. **Inicie o chatbot**:
-   ```cmd
-   start.bat
+3. **Instale as dependências:**
+   ```bash
+   pip install -r requirements.txt
    ```
+4. **Coloque o PDF da tese** na raiz do projeto:
+   - `Roteiro-de-Dsispensacao-Hanseniase-F.docx.pdf`
+5. **Inicie a interface web:**
+   ```bash
+   python -m app.streamlit_app
+   # ou
+   streamlit run app/streamlit_app.py
+   ```
+6. **Acesse:** [http://localhost:8501](http://localhost:8501)
 
-### Linux/Mac
+### Principais Funcionalidades
+- Chat com duas personalidades: Dr. Gasnelio (técnico) e Gá (amigável)
+- Respostas baseadas em IA e informações da tese
+- Interface web moderna e responsiva
+- Upload de documentos e busca semântica
+
+---
+
+## 👨‍💻 Para Desenvolvedores
+
+### Estrutura Modular
+- **app/**: Backend principal (Flask), lógica RAG, integração LangFlow
+- **app/services/**: Funções utilitárias centralizadas (chunk_text, extract_text_from_pdf, etc)
+- **backend/**: Alternativa de backend, endpoints REST, integrações
+- **frontend/**: Interface Streamlit (web)
+- **scripts/**: Scripts de build, manutenção e utilidades
+- **tests/**: Testes automatizados
+
+### Executando o Backend (API Flask)
 ```bash
-# Clone o repositório
-git clone <url-do-repositorio>
-cd gemini-v2
-
-# Baixe o PDF da tese do link fornecido
-# Salve como: Roteiro-de-Dsispensacao-Hanseniase-F.docx.pdf
-
-# Execute o instalador automático
-python3 install_and_check.py
+python -m app.flask_api
+# ou
+python app/main.py --mode flask
 ```
+Acesse: [http://localhost:5000](http://localhost:5000)
 
-### Instalação Manual
-1. **Clone o repositório**:
+### Executando o Frontend (Streamlit)
 ```bash
-git clone <url-do-repositorio>
-cd gemini-v2
+python -m app.streamlit_app
+# ou
+streamlit run app/streamlit_app.py
 ```
+Acesse: [http://localhost:8501](http://localhost:8501)
 
-2. **Instale as dependências**:
+### Testes
 ```bash
-pip install -r requirements.txt
+pytest tests/
 ```
 
-3. **Coloque o PDF da tese** na raiz do projeto:
-```
-gemini-v2/
-├── Roteiro-de-Dsispensacao-Hanseniase-F.docx.pdf
-├── app_optimized.py
-├── requirements.txt
-└── ...
-```
+### Variáveis de Ambiente Importantes
+- `ASTRA_DB_TOKEN`, `ASTRA_DB_API_ENDPOINT`: Integração com Astra DB
+- `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`: Integração com LLMs externos
+- `LANGFLOW_API_KEY`, `LANGFLOW_BASE_URL`: Integração com LangFlow
+- `FLASK_HOST`, `FLASK_PORT`, `STREAMLIT_HOST`, `STREAMLIT_PORT`: Configuração de servidores
 
-4. **Analise a compatibilidade**:
-```bash
-python3 pdf_analyzer.py
-```
+Configure variáveis em `.env` ou diretamente no ambiente.
 
-## 🚀 Execução
-
-### Desenvolvimento
-```bash
-python app_optimized.py
+### Utilização dos Utilitários Centralizados
+Exemplo de uso do chunking:
+```python
+from app.services.text_utils import chunk_text
+chunks = chunk_text(texto, chunk_size=1500, overlap=300)
 ```
 
-### Produção
-```bash
-gunicorn app_optimized:app
-```
+---
 
-### Script de Inicialização
-```bash
-./start.sh
-```
+## 🔗 Endpoints Principais (API Flask)
+- `GET /api/health` — Health check
+- `POST /api/chat` — Envia mensagem ao chatbot
+- `GET /api/flows` — Lista fluxos LangFlow
+- `POST /api/flows` — Cria novo fluxo
+- `POST /api/calculate` — Calcula parâmetros de dispersão
+- `POST /api/upload` — Upload de documentos
 
-O servidor estará disponível em `http://localhost:5000`
+Veja exemplos de payloads e respostas na documentação dos endpoints.
 
-## 📡 Endpoints da API
+---
 
-### POST `/api/chat`
-Envia uma pergunta para o chatbot.
+## 🧩 Decisões de Design e Modularização
+- **Centralização de utilitários:** Todas as funções de chunking, PDF, expansão de sinônimos e resposta estão em `app/services/`
+- **Remoção de duplicidade:** Funções duplicadas e scripts antigos foram removidos ou arquivados
+- **Documentação:** Todos os módulos, funções e lógicas complexas estão documentados com docstrings e comentários explicativos
+- **Testes:** Estrutura pronta para testes automatizados
+- **Fácil manutenção:** Separação clara entre backend, frontend, utilitários e scripts
 
-**Request:**
-```json
-{
-  "question": "Qual a dose de rifampicina?",
-  "personality_id": "dr_gasnelio"
-}
-```
+---
 
-**Response:**
-```json
-{
-  "answer": "Dr. Gasnelio responde:\n\nA dose de rifampicina...",
-  "persona": "dr_gasnelio",
-  "confidence": 0.85,
-  "timestamp": "2025-01-13T10:30:00",
-  "question": "Qual a dose de rifampicina?"
-}
-```
+## 📝 Manutenção e Contribuição
+- Siga o padrão de modularização e centralização de utilitários
+- Documente funções e lógicas complexas
+- Prefira abrir issues ou pull requests para contribuições
+- Consulte a pasta `relatorio-disp/` para histórico e documentação legada
 
-### GET `/api/health`
-Verifica o status da API.
+---
 
-### GET `/api/info`
-Informações sobre a API.
+## 👥 Autores e Contato
+- **Nélio Gomes** — Pesquisador Principal
+- **Universidade de Brasília (UnB)** — Programa de Pós-Graduação em Ciências Farmacêuticas
 
-## 🎭 Personalidades
-
-### Dr. Gasnelio
-- Tom sério e técnico
-- Linguagem formal
-- Foco em precisão científica
-- Inclui nível de confiança
-
-### Gá
-- Tom descontraído e amigável
-- Linguagem simples
-- Explicações acessíveis
-- Usa emojis e expressões informais
-
-## 🔧 Configuração
-
-### Variáveis de Ambiente
-- `PORT`: Porta do servidor (padrão: 5000)
-- `FLASK_ENV`: Ambiente (development/production)
-
-### Configuração Automática
-O sistema analisa automaticamente o PDF e gera configurações otimizadas:
-- **PDFs Pequenos** (< 50k chars): Processamento direto
-- **PDFs Médios** (50k-100k chars): Chunking básico + cache
-- **PDFs Grandes** (> 100k chars): Chunking avançado + cache + busca semântica
-
-### Personalização
-Edite `app_optimized.py` ou `optimized_config.json` para:
-- Alterar o modelo de IA
-- Modificar as personalidades
-- Ajustar parâmetros de confiança
-- Configurar chunking e cache
-
-## 📦 Deploy
-
-### Heroku
-```bash
-heroku create
-git push heroku main
-```
-
-### Railway
-```bash
-railway login
-railway init
-railway up
-```
-
-### Render
-1. Conecte o repositório
-2. Configure o build command: `pip install -r requirements.txt`
-3. Configure o start command: `gunicorn app:app`
-
-## 🐛 Troubleshooting
-
-### Erro: "PDF não encontrado"
-- Verifique se o arquivo PDF está na raiz do projeto
-- Confirme o nome do arquivo: `Roteiro-de-Dsispensacao-Hanseniase-F.docx.pdf`
-- Execute: `python3 install_and_check.py` para verificação automática
-
-### Erro: "Modelo não carregado"
-- Verifique a conexão com internet (para baixar o modelo)
-- Confirme se as dependências foram instaladas corretamente
-- Execute: `pip install -r requirements.txt`
-
-### Erro: "Memória insuficiente"
-- O modelo pode consumir muita RAM
-- Considere usar um servidor com mais memória
-- Para PDFs grandes, use configurações otimizadas
-
-### Erro: "Resposta muito lenta"
-- Execute: `python3 pdf_analyzer.py` para análise
-- Ajuste configurações em `optimized_config.json`
-- Considere reduzir `chunk_size` ou aumentar `overlap`
-
-### Erro: "Baixa precisão"
-- Aumente `confidence_threshold` na configuração
-- Habilite `use_semantic_search` para PDFs complexos
-- Verifique se o PDF tem texto extraível
-
-## 📝 Licença
-
-Este projeto é parte da tese de doutorado sobre roteiro de dispensação para hanseníase.
-
-## 🗂️ Histórico de Versões e Documentação
-
-Este projeto passou por diversas fases de desenvolvimento e modularização. Abaixo estão os principais marcos e referências de documentação:
-
-- **2023-2024:** Estrutura inicial do chatbot, integração com PDF e personalidades.
-- **2024-05:** Refatoração para modularização, centralização de utilitários e remoção de duplicidades.
-- **2024-06:** Limpeza de scripts antigos, consolidação de documentação e atualização do README principal.
-- **Guias e tutoriais antigos:**
-  - Diversos arquivos `.md` de deploy, troubleshooting e migração foram consolidados neste README.
-  - Para histórico detalhado, consulte o repositório ou os arquivos arquivados na pasta `relatorio-disp/`.
-
-Caso precise de informações sobre versões anteriores, consulte o histórico do repositório ou entre em contato com os autores.
-
-## 👥 Autores
-
-- **Nélio Gomes** - Pesquisador Principal
-- **Universidade de Brasília (UnB)** - Programa de Pós-Graduação em Ciências Farmacêuticas
-
-## 🤝 Contribuições
-
-Contribuições são bem-vindas! Por favor, abra uma issue ou pull request. 
+Contribuições são bem-vindas! Abra uma issue ou pull request. 
