@@ -205,6 +205,19 @@ railway up
 
 Este projeto é parte da tese de doutorado sobre roteiro de dispensação para hanseníase.
 
+## 🗂️ Histórico de Versões e Documentação
+
+Este projeto passou por diversas fases de desenvolvimento e modularização. Abaixo estão os principais marcos e referências de documentação:
+
+- **2023-2024:** Estrutura inicial do chatbot, integração com PDF e personalidades.
+- **2024-05:** Refatoração para modularização, centralização de utilitários e remoção de duplicidades.
+- **2024-06:** Limpeza de scripts antigos, consolidação de documentação e atualização do README principal.
+- **Guias e tutoriais antigos:**
+  - Diversos arquivos `.md` de deploy, troubleshooting e migração foram consolidados neste README.
+  - Para histórico detalhado, consulte o repositório ou os arquivos arquivados na pasta `relatorio-disp/`.
+
+Caso precise de informações sobre versões anteriores, consulte o histórico do repositório ou entre em contato com os autores.
+
 ## 👥 Autores
 
 - **Nélio Gomes** - Pesquisador Principal
