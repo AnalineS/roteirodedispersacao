@@ -88,3 +88,4 @@ cache/
 # Vector Store RAG.json - contains API tokens
 # .env_vector_rag - contains environment variables
 .env_vector_rag
+desktop.ini
